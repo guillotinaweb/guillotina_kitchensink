@@ -1,0 +1,38 @@
+guillotina:
+  build: .
+  stdin_open: true
+  tty: true
+  volumes:
+  - .:/app
+  - logvolume01:/var/log
+  links:
+  - redis
+  - elasticsearch
+  - postgresql
+  command: g -c /config.yaml
+  ports:
+  - "8080:8080"
+redis:
+  image: redis
+  container_name: g-kitchensink-redis1
+elasticsearch:
+  image: docker.elastic.co/elasticsearch/elasticsearch:5.6.2
+  container_name: g-kitchensink-elasticsearch1
+  volumes:
+  - gkitchensinkesdata1:/usr/share/elasticsearch/data
+  ports:
+  - 9200:9200
+  - 9300:9300
+  environment:
+  - discovery.type=single-node
+  - xpack.security.enabled=false
+postgresql:
+  image: postgres:9.6
+  container_name: g-kitchensink-postgresql1
+  volumes:
+  - gkitchensinkpostres1:/var/lib/postgresql/data
+  ports:
+  - 5432:5432
+  environment:
+  - POSTGRES_DB=guillotina
+  - POSTGRES_USER=postgres
